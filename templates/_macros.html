@@ -1,0 +1,15 @@
+{# =====================================================================
+   _macros.html : 여러 화면에서 똑같이 쓰는 작은 조각(매크로)을 모아 둔 곳이에요.
+   쓰고 싶은 화면에서 {% from "_macros.html" import folder %} 라고 불러와요.
+   ===================================================================== #}
+
+{# 폴더 아이콘이에요. color에 pink / yellow / blue / lav 중 하나를 넣으면 그 색 폴더가 나와요. #}
+{% macro folder(color) %}<span class="folder {{ color }}"><span class="back"></span><span class="front"></span></span>{% endmacro %}
+
+{# 첫 화면에 놓이는 "폴더 + 이름표" 한 묶음이에요. style에는 자리(left/top)를 넣을 수 있어요. #}
+{% macro folder_link(f, style="") %}
+  <a class="folder-link" href="{{ url_for('area_page', area=f.name) }}" {% if style %}style="{{ style }}"{% endif %}>
+    {{ folder(f.color) }}
+    <span>{{ f.label }} <span class="count">· {{ f.count }}</span></span>
+  </a>
+{% endmacro %}

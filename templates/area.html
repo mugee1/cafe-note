@@ -1,0 +1,79 @@
+{# 지역 화면: 공통 틀을 물려받고, 본문에 "네이버 지도 + 카페 카드 목록"을 채워요. #}
+{% extends "base.html" %}
+{% from "_macros.html" import folder %}
+
+{% block title %}{{ area }} · 나만의 카페 노트{% endblock %}
+
+{% block content %}
+<div class="body">
+  <a class="crumb" href="{{ url_for('home') }}">← {{ folder("lav") }} 폴더로 돌아가기</a>
+  <div class="title">{{ folder(color) }}<h1>{{ area }}</h1><small>{{ total }}곳의 카페</small></div>
+
+  {# 지도가 들어갈 자리예요. 실제 지도는 아래 scripts 칸의 자바스크립트가 그려요. #}
+  <div id="map"></div>
+
+  <form class="filter" method="get">
+    <input name="q" value="{{ q }}" placeholder="카페 이름이나 메뉴 검색">
+    <select name="outlet">
+      <option value="">콘센트 상관없음</option>
+      <option value="있음" {{ "selected" if outlet == "있음" }}>콘센트 있는 곳만</option>
+    </select>
+    <select name="sort">
+      <option value="id" {{ "selected" if sort == "id" }}>번호순</option>
+      <option value="rating" {{ "selected" if sort == "rating" }}>평점 높은순</option>
+      <option value="price" {{ "selected" if sort == "price" }}>가격 낮은순</option>
+    </select>
+    <button class="go" type="submit">찾기</button>
+  </form>
+  <p class="found">찾은 카페: {{ cafes|length }}곳</p>
+
+  <div class="grid">
+    {% for c in cafes %}
+      <div class="card">
+        <a href="{{ url_for('detail', cafe_id=c.id) }}">
+          {% if c.image %}<img class="photo" src="{{ photo_url(c.image) }}" alt="{{ c.name }} 사진" loading="lazy">
+          {% else %}<div class="photo no-photo">☕</div>{% endif %}
+        </a>
+        <a class="name" href="{{ url_for('detail', cafe_id=c.id) }}">{{ c.name }}</a><br>
+        <span class="tag p">{{ c.area }}</span>
+        <span class="tag y">{{ c.menu }}</span>
+        <span class="tag b">★ {{ c.rating if c.rating else "-" }}</span>
+        {% if notes.get(c.id|string) %}<div class="memo">📝 {{ notes[c.id|string] }}</div>{% endif %}
+      </div>
+    {% else %}
+      <p>조건에 맞는 카페가 없어요 😢 <a href="{{ url_for('register') }}">새 카페를 등록해 볼까요?</a></p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // 네이버가 "열쇠가 맞지 않아요!" 하고 거절하면, 지도 자리에 이유를 적어 보여줘요.
+    window.navermap_authFailure = () => {
+      document.getElementById("map").innerHTML = "<p style='padding:16px'>🔑 네이버 지도 인증에 실패했어요. 네이버 클라우드 콘솔에서 Client ID와 서비스 URL(http://127.0.0.1:5000)을 확인해 주세요.</p>";
+    };
+  </script>
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ map_key }}"></script>
+  <script>
+    // 지역별 위치와 카페 수를 파이썬에게 받아와요.
+    const pins = {{ pins|tojson }};
+    const chosen = {{ area|tojson }};
+    const areaUrl = {{ url_for('area_page', area='__AREA__')|tojson }};
+    // 고른 지역이 지도에 있으면 그 동네를 크게, "전체"이거나 위치를 모르는 새 지역이면 우리나라 전체를 보여줘요.
+    const here = pins[chosen];
+    const map = new naver.maps.Map("map", {
+      center: here ? new naver.maps.LatLng(...here.pos) : new naver.maps.LatLng(36.4, 127.8),
+      zoom: here ? 14 : 7,
+    });
+    // 지역마다 "합정 · 4곳" 모양의 분홍 핀을 꽂아요. 누르면 그 지역 폴더로 들어가요.
+    for (const [name, info] of Object.entries(pins)) {
+      const marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(...info.pos),
+        map: map,
+        icon: { content: `<div class="pin ${name === chosen ? "on" : ""}">${name} · ${info.count}곳</div>`, anchor: new naver.maps.Point(40, 16) },
+      });
+      naver.maps.Event.addListener(marker, "click", () => { location.href = areaUrl.replace("__AREA__", encodeURIComponent(name)); });
+    }
+  </script>
+{% endblock %}

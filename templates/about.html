@@ -1,0 +1,36 @@
+{# 소개 화면: 공통 틀을 물려받고, 본문에 "이 서비스는 무엇인지"를 채워요. #}
+{% extends "base.html" %}
+{% from "_macros.html" import folder %}
+
+{% block title %}소개 · 나만의 카페 노트{% endblock %}
+
+{% block content %}
+<div class="body about">
+  <div class="title">{{ folder("lav") }}<h1>나만의 카페 노트</h1></div>
+  <p class="lead">가 본 카페, 가 보고 싶은 카페를 동네 폴더에 모아 두는 작은 노트예요.<br>
+    카페마다 대표 메뉴와 영업시간, 콘센트가 있는지 적어 두고, 다녀온 느낌은 메모로 남겨요.</p>
+
+  {# 숫자 세 개를 카드로 보여줘요. #}
+  <div class="stats">
+    <div class="stat pinkbg"><b>{{ cafe_count }}</b><span>기록한 카페</span></div>
+    <div class="stat yellowbg"><b>{{ area_count }}</b><span>동네 폴더</span></div>
+    <div class="stat bluebg"><b>{{ memo_count }}</b><span>남긴 메모</span></div>
+  </div>
+
+  <h2>이렇게 써요</h2>
+  <ol class="steps">
+    <li><b>폴더 고르기</b> 홈에서 동네 폴더를 누르면 그 동네의 지도와 카페 목록이 나와요.</li>
+    <li><b>카페 살펴보기</b> 카드를 누르면 대표 메뉴 사진, 가격, 영업시간을 볼 수 있어요.</li>
+    <li><b>메모 남기기</b> 다녀온 카페에는 나만의 메모를 적어 두세요. 목록 카드에도 같이 보여요.</li>
+    <li><b>카페 등록하기</b> 새로 발견한 카페는 <a href="{{ url_for('register') }}">카페 등록</a>에서 추가해요. 처음 보는 동네라면 홈에 새 폴더가 생겨요.</li>
+  </ol>
+
+  <h2>무엇으로 만들었나요?</h2>
+  <ul class="plain">
+    <li>🐍 <b>Flask</b>: 파이썬으로 웹사이트를 만드는 도구예요.</li>
+    <li>🧩 <b>Jinja 템플릿</b>: 공통 틀(base.html)을 물려받아 화면마다 본문만 채워요.</li>
+    <li>🗺️ <b>네이버 지도</b>: 동네마다 핀을 꽂아 보여줘요.</li>
+    <li>🎨 <b>AI 이미지</b>: 연습용 카페라서 대표 메뉴 사진은 AI가 그렸어요.</li>
+  </ul>
+</div>
+{% endblock %}

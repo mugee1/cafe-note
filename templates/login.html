@@ -1,0 +1,29 @@
+{# 로그인 화면: 공통 틀을 물려받고, 본문에 "주인 비밀번호 입력 칸"을 채워요. #}
+{% extends "base.html" %}
+{% from "_macros.html" import folder %}
+
+{% block title %}관리자 로그인 · 나만의 카페 노트{% endblock %}
+
+{% block content %}
+<div class="body login-page">
+  <div class="login-card">
+    <div class="title">{{ folder("lav") }}<h1>관리자 로그인</h1></div>
+    <p class="lead">카페 등록과 메모 쓰기는 이 노트의 주인만 할 수 있어요.<br>구경은 로그인 없이 누구나 할 수 있어요.</p>
+
+    {% if not ready %}
+      {# 아직 비밀번호를 정하지 않았으면, 정하는 방법을 알려줘요. #}
+      <div class="errors"><p>🔑 아직 비밀번호가 없어요. 터미널에서 <code>python set_password.py</code> 를 실행해 비밀번호를 먼저 정해 주세요.</p></div>
+    {% endif %}
+    {% if error %}<div class="errors"><p>⚠️ {{ error }}</p></div>{% endif %}
+
+    <form method="post" class="login-form">
+      {# 로그인 뒤에 돌아갈 주소를 몰래(hidden) 같이 보내요. #}
+      <input type="hidden" name="next" value="{{ next }}">
+      <label>비밀번호
+        <input type="password" name="password" autocomplete="current-password" required autofocus>
+      </label>
+      <button class="go" type="submit">로그인</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

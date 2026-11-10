@@ -1,0 +1,52 @@
+{# 홈 화면: 공통 틀(base.html)을 물려받고, 본문 칸만 "지역 폴더판"으로 채워요. #}
+{% extends "base.html" %}
+{% from "_macros.html" import folder_link %}
+
+{% block content %}
+  {# ===== 폴더판: 지역 폴더들이 가운데 콜라주를 빙 둘러싸요 ===== #}
+  <div class="stage">
+  {# 폴더판 오른쪽 아래에 떠 있는 크게/작게 버튼이에요. (폴더판과 같이 커지지 않도록 stage-inner 밖에 둬요) #}
+  <div class="zoom-ctrl">
+    <button type="button" onclick="zoom(.1)" title="크게 보기" aria-label="크게 보기">+</button>
+    <button type="button" onclick="zoom(-.1)" title="작게 보기" aria-label="작게 보기">−</button>
+  </div>
+  <div class="stage-inner" id="zoomer">
+    {% for f in ring %}
+      {{ folder_link(f, "left: %s%%; top: %s%%" % (f.x, f.y)) }}
+    {% endfor %}
+
+    <div class="hero">
+      <svg class="burst a" viewBox="0 0 100 100"><polygon points="{{ burst }}"/></svg>
+      <svg class="burst b" viewBox="0 0 100 100"><polygon points="{{ burst }}"/></svg>
+      <div class="pback"></div>
+      {% for c in featured %}<img class="shot s{{ loop.index }}" src="{{ photo_url(c.image) }}" alt="{{ c.name }}">{% endfor %}
+      <span class="sticker">★ best {{ featured|length }}</span>
+      <a class="pocket" href="{{ url_for('area_page', area=all_name) }}" title="모든 카페 보기"></a>
+      <form class="ask" method="get" action="{{ url_for('area_page', area=all_name) }}">
+        오늘은 어떤 카페에 갈까요? 이름이나 메뉴로 찾아봐요.
+        <input name="q" placeholder="search cafe...">
+      </form>
+      <a class="namepill" href="{{ url_for('area_page', area=all_name) }}">나만의 카페 노트</a>
+      <svg class="cursor" viewBox="0 0 24 28"><path d="M3 2v20l5.2-4.8 3.3 7.6 3.4-1.4-3.3-7.4H19z" fill="#fff" stroke="#1f1f24" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </div>
+  </div></div>
+
+  {# ===== 새로 생긴 폴더: 가운데를 둘러싼 6자리가 다 차면, 그다음 지역 폴더는 여기에 차례로 놓여요.
+         폴더가 늘어날수록 이 영역이 아래로 점점 길어져요. ===== #}
+  {% if more %}
+    <section class="more" id="more">
+      <p class="more-title">📂 새로 생긴 지역 폴더 · {{ more|length }}개</p>
+      <div class="more-grid">
+        {% for f in more %}{{ folder_link(f) }}{% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // 돋보기 버튼을 누르면 폴더판을 크게/작게 보여줘요.
+    let scale = 1;
+    function zoom(d) { scale = Math.min(1.4, Math.max(.7, scale + d)); document.getElementById("zoomer").style.transform = `scale(${scale})`; }
+  </script>
+{% endblock %}

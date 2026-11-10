@@ -1,0 +1,220 @@
+/* =====================================================================
+   style.css : 나만의 카페 노트의 모든 꾸밈이 들어 있는 한 파일이에요.
+   1. 색깔 · 기본    2. 공통 틀(머리 · 메뉴 · 바닥)    3. 폴더 아이콘
+   4. 홈 폴더판      5. 지역 화면    6. 카페 상세    7. 소개    8. 카페 등록
+   ===================================================================== */
+
+
+/* ===== 1. 색깔 · 기본 ===== */
+/* 쓰는 색깔들에 이름을 붙여 모아둬요. 여기만 바꾸면 전체 색이 바뀌어요. */
+:root {
+  --paper: #ffffff;  --ground: #f3f2f6;  --ink: #1f1f24;  --muted: #7a7a85;  --line: #e8e6ee;
+  --pink: #f8b9d4;   --pink-2: #fcd0e2;
+  --yellow: #fbb636; --yellow-2: #fdc950;
+  --blue: #96c7f6;   --blue-2: #b3d8fc;
+  --lav: #b9a8f1;    --lav-2: #cdc1f9;  --lav-soft: #f0ecfd;
+  --star: #fde58c;
+}
+* { box-sizing: border-box; }
+body { font-family: "Poppins", "Noto Sans KR", sans-serif; background: var(--ground); color: var(--ink); margin: 0; }
+a { color: inherit; }
+input, select, button, textarea { font-family: inherit; font-size: 15px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); }
+button.go { background: var(--ink); color: #fff; border: none; cursor: pointer; padding: 9px 18px; border-radius: 99px; }
+
+
+/* ===== 2. 공통 틀: 머리(로고 · 메뉴 · 등록 버튼) · 바닥 글씨 (base.html) ===== */
+/* 화면 전체를 꽉 채우는 하얀 판이에요. 본문(main)이 짧아도 바닥 글씨는 화면 맨 아래에 붙어요. */
+.board { min-height: 100vh; background: var(--paper); display: flex; flex-direction: column; }
+main { flex: 1; }
+
+/* 머리(Header)의 높이예요. 홈 폴더판이 "화면 높이 - 머리 높이"만큼 꽉 차도록 같이 써요. */
+:root { --header-h: 68px; }
+
+/* 맨 위 머리(Header): [로고]   [홈 소개]   [+ 카페 등록]
+   grid-template-areas로 "어느 칸에 무엇을 놓을지"를 이름으로 정해요. 스크롤해도 위에 붙어 있어요. */
+.site-header {
+  position: sticky; top: 0; z-index: 20;
+  height: var(--header-h);
+  display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "logo nav cta";
+  align-items: center; gap: 24px;
+  padding: 0 clamp(16px, 3vw, 40px);
+  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+/* 로고: 보라 폴더 + 서비스 이름 */
+.logo { grid-area: logo; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo .folder { width: 30px; }
+.logo span { font-family: "Noto Sans KR", sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -.02em; white-space: nowrap; }
+
+/* 메뉴: 글자 + 아이콘. 지금 있는 메뉴는 진한 글씨 + 아래 보라 밑줄로 알려줘요. */
+.nav { grid-area: nav; display: flex; justify-content: flex-end; gap: 4px; height: 100%; }
+.nav a { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; text-decoration: none; color: var(--muted); font-size: 15px; font-weight: 500; }
+.nav a svg { width: 18px; height: 18px; }
+.nav a:hover { color: var(--ink); }
+.nav a.on { color: var(--ink); font-weight: 700; }
+.nav a.on::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: var(--lav); }
+
+/* 카페 등록 버튼: 가장 중요한 행동이라 검은 알약 버튼으로 눈에 띄게 해요. */
+.cta { grid-area: cta; display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 99px; background: var(--ink); color: #fff; text-decoration: none; font-size: 14.5px; font-weight: 600; white-space: nowrap; transition: background .15s, transform .15s; }
+.cta svg { width: 16px; height: 16px; }
+.cta:hover { background: #3a3a44; transform: translateY(-1px); }
+.cta.on { background: var(--lav); color: var(--ink); }
+
+/* 휴대폰처럼 좁은 화면: 첫째 줄에 로고와 등록 버튼, 둘째 줄에 메뉴를 반반 나눈 큰 탭으로 놓아요. (손가락으로 누르기 쉬워요) */
+@media (max-width: 640px) {
+  :root { --header-h: 108px; }
+  .site-header { grid-template-columns: 1fr auto; grid-template-areas: "logo cta" "nav nav"; grid-template-rows: 60px 48px; gap: 0 12px; }
+  .logo span { font-size: 17px; }
+  .cta { padding: 9px 14px; font-size: 14px; }
+  .nav { margin: 0 calc(-1 * clamp(16px, 3vw, 40px)); border-top: 1px solid var(--line); gap: 0; }
+  .nav a { flex: 1; justify-content: center; }
+  .nav a.on::after { left: 22%; right: 22%; }
+}
+
+/* 안내 쪽지(flash): 로그인했어요 / 로그아웃했어요 같은 말을 본문 위에 잠깐 보여줘요. */
+.flashes { margin: 16px clamp(16px, 3vw, 40px) 0; }
+.flashes p { margin: 0 0 8px; padding: 10px 14px; border-radius: 10px; background: var(--lav-soft); font-size: 14.5px; }
+
+/* 맨 아래 바닥 글씨 */
+.foot-right { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.foot a { color: var(--muted); }
+form.inline { display: inline; }
+.linklike { background: none; border: none; padding: 0; font: inherit; color: var(--muted); text-decoration: underline; cursor: pointer; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; padding: 18px clamp(16px, 3vw, 40px); border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+
+
+
+/* ===== 3. 폴더 아이콘 (_macros.html의 folder) ===== */
+/* 폴더 자신을 기준(container)으로 삼아서, 모서리 둥글기가 폴더 크기에 맞춰져요.
+   그래서 첫 화면의 큰 폴더든, 지역 화면의 작은 폴더든 똑같은 모양으로 보여요. (cqw = 폴더 폭의 1%) */
+.folder { position: relative; display: block; flex: none; width: 19cqmin; aspect-ratio: 1.2; container-type: inline-size; transition: transform .2s; }
+.folder .back { position: absolute; inset: 9% 0 0 0; background: var(--c1); border-radius: 12cqw; }
+.folder .back::before { content: ""; position: absolute; left: 0; top: -11%; width: 44%; height: 30%; background: var(--c1); border-radius: 11cqw 11cqw 0 0; }
+.folder .front { position: absolute; left: 0; right: 0; bottom: 0; height: 76%; background: var(--c2); border-radius: 12cqw; transform-origin: bottom; transition: transform .2s; }
+.pink   { --c1: var(--pink);   --c2: var(--pink-2); }
+.yellow { --c1: var(--yellow); --c2: var(--yellow-2); }
+.blue   { --c1: var(--blue);   --c2: var(--blue-2); }
+.lav    { --c1: var(--lav);    --c2: var(--lav-2); }
+
+
+/* ===== 4. 홈 폴더판 (home.html) ===== */
+/* 제목 줄 아래 남은 화면을 전부 써요. 크기는 가로·세로 중 짧은 쪽(cqmin)에 맞춰서 어떤 화면에서도 잘리지 않아요. */
+.stage { position: relative; height: max(520px, calc(100vh - var(--header-h))); container-type: size; overflow: hidden; }
+/* 폴더판 오른쪽 아래에 떠 있는 크게(+)/작게(−) 버튼 */
+.zoom-ctrl { position: absolute; right: 20px; bottom: 20px; z-index: 6; display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 2px 10px rgba(40,30,80,.08); overflow: hidden; }
+.zoom-ctrl button { width: 40px; height: 40px; padding: 0; border: none; border-radius: 0; background: none; font-size: 20px; line-height: 1; cursor: pointer; color: #444; }
+.zoom-ctrl button + button { border-top: 1px solid var(--line); }
+.zoom-ctrl button:hover { background: var(--lav-soft); }
+.stage-inner { position: absolute; inset: 0; transition: transform .25s; }
+.folder-link { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 1.6cqmin; text-decoration: none; font-size: max(11px, 3cqmin); color: #333; }
+.folder-link > span { text-align: center; }
+.folder-link:hover .folder { transform: translateY(-1.4cqmin) rotate(-3deg); }
+.folder-link:hover .folder .front { transform: perspective(40cqmin) rotateX(-18deg); }
+.folder-link .count { color: var(--muted); }
+
+/* 가운데 큰 보라 폴더 + 사진 콜라주 */
+.hero { position: absolute; left: 50%; top: 51%; width: 48cqmin; height: 58cqmin; transform: translate(-50%, -50%); }
+.burst { position: absolute; width: 21cqmin; fill: var(--star); }
+.burst.a { left: -10cqmin; top: 23cqmin; }
+.burst.b { right: -8cqmin; top: 35cqmin; width: 15cqmin; }
+.hero .pback { position: absolute; left: 0; right: 0; top: 6cqmin; height: 36cqmin; background: var(--lav); border-radius: 2.6cqmin; }
+.hero .pback::before { content: ""; position: absolute; left: 0; top: -3.4cqmin; width: 42%; height: 6cqmin; background: var(--lav); border-radius: 2.4cqmin 2.4cqmin 0 0; }
+.shot { position: absolute; aspect-ratio: 3 / 4; object-fit: cover; background: #eee; border: .9cqmin solid #fff; border-radius: 1.2cqmin; box-shadow: 0 1cqmin 2.4cqmin rgba(30,20,60,.18); }
+.shot.s1 { width: 20cqmin; left: 1cqmin;  top: 6cqmin; transform: rotate(-9deg); }
+.shot.s3 { width: 20cqmin; left: 27cqmin; top: 5cqmin; transform: rotate(8deg); }
+.shot.s2 { width: 23cqmin; left: 12.5cqmin; top: 0; z-index: 1; }
+.sticker { position: absolute; left: 30cqmin; top: -1.5cqmin; z-index: 2; background: #fff; border: 1px solid var(--ink); border-radius: 1cqmin; padding: .4cqmin 1.4cqmin; font-size: max(9px, 2.4cqmin); font-weight: 600; transform: rotate(6deg); }
+.pocket { position: absolute; left: 0; right: 0; top: 22cqmin; height: 21cqmin; z-index: 3; background: var(--lav-2); border-radius: 2.6cqmin; display: block; }
+.pocket:hover { background: #d6ccfb; }
+.ask { position: absolute; z-index: 4; right: -4cqmin; top: 27cqmin; width: 25cqmin; background: #fff; border: 1px solid #cfcfd6; border-radius: 1.4cqmin; padding: 1.6cqmin; font-size: max(9px, 2.3cqmin); line-height: 1.35; box-shadow: 0 1cqmin 2cqmin rgba(30,20,60,.08); }
+.ask input { width: 100%; margin-top: 1.2cqmin; border: 1px solid #999; border-radius: 99px; padding: .8cqmin 1.6cqmin; font: inherit; }
+.namepill { position: absolute; left: 50%; top: 46cqmin; transform: translateX(-50%); z-index: 4; background: var(--pink); padding: 1cqmin 3.4cqmin; border-radius: 1.6cqmin; font-size: max(13px, 4.4cqmin); font-weight: 500; white-space: nowrap; text-decoration: none; }
+.cursor { position: absolute; z-index: 5; left: 58%; top: 50cqmin; width: 6cqmin; }
+
+/* (위 규칙들보다 뒤에 있어야 덮어쓸 수 있어요) 휴대폰처럼 세로로 긴 화면이면: 가운데 콜라주를 조금 줄이고, 폴더 이름은 두 줄로 가운데 정렬해요. */
+@container (max-aspect-ratio: 4 / 5) {
+  .hero { transform: translate(-50%, -50%) scale(.8); }
+  .folder-link > span { max-width: 30cqw; font-size: max(11px, 2.6cqmin); }
+}
+
+/* 새로 생긴 지역 폴더 영역: 폴더판 아래에 붙어서, 폴더가 늘어날수록 아래로 길어져요.
+   여기는 폴더판 밖이라 cqmin이 "화면 가로·세로 중 짧은 쪽"을 기준으로 계산돼서, 위 폴더들과 크기가 거의 같아요. */
+.more { padding: 8px clamp(16px, 3vw, 40px) 56px; border-top: 1px dashed var(--line); }
+.more-title { text-align: center; color: var(--muted); font-size: 14px; margin: 18px 0 28px; }
+.more-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 5vmin 8vmin; }
+.more .folder-link { position: static; transform: none; }
+
+
+/* ===== 5. 지역 화면 (area.html) ===== */
+.body { padding: 24px clamp(16px, 3vw, 40px) 48px; }
+.crumb { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-size: 14px; color: var(--muted); }
+.crumb .folder { width: 26px; }
+.title { display: flex; align-items: center; gap: 12px; margin: 10px 0 16px; }
+.title .folder { width: 46px; }
+.title h1 { font-size: 30px; margin: 0; font-weight: 600; }
+.title small { color: var(--muted); font-size: 15px; }
+#map { width: 100%; height: clamp(320px, 45vh, 560px); border-radius: 14px; margin-bottom: 20px; background: var(--lav-soft); }
+.pin { background: var(--pink); color: var(--ink); padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.18); cursor: pointer; border: 2px solid #fff; }
+.pin.on { background: var(--lav); }
+form.filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+form.filter input { flex: 1 1 180px; }
+.found { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px; transition: transform .15s, box-shadow .15s; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(40,30,80,.08); }
+.card a.name { font-weight: 600; font-size: 17px; text-decoration: none; }
+.photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; display: block; margin-bottom: 10px; }
+.no-photo { display: flex; align-items: center; justify-content: center; font-size: 44px; background: var(--lav-soft); }
+.tag { display: inline-block; background: var(--lav-soft); border-radius: 99px; padding: 3px 10px; margin: 6px 4px 0 0; font-size: 12.5px; }
+.tag.p { background: var(--pink-2); } .tag.y { background: #feecc0; } .tag.b { background: #dcecfd; }
+.memo { color: var(--muted); font-size: 13.5px; margin-top: 8px; }
+
+
+/* ===== 6. 카페 상세 (cafe.html) ===== */
+.detail h2 { margin: 6px 0 4px; font-weight: 600; font-size: 30px; }
+.big { max-height: none; margin: 0; }
+.big.no-photo { font-size: 96px; }
+.notice { background: #e6f7ec; border-radius: 10px; padding: 10px 14px; margin: 14px 0 0; }
+/* 넓은 화면에서는 왼쪽에 사진, 오른쪽에 정보와 메모를 나란히 놓아요. */
+.split { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; margin-top: 16px; align-items: start; }
+.split textarea { width: 100%; height: 200px; }
+.memo-read { white-space: pre-wrap; line-height: 1.7; background: var(--lav-soft); border-radius: 12px; padding: 14px 16px; color: #44444d; }
+
+/* 로그인 화면: 가운데 작은 카드 */
+.login-page { display: flex; justify-content: center; }
+.login-card { width: 100%; max-width: 440px; margin-top: 4vh; }
+.login-form { display: flex; flex-direction: column; gap: 14px; }
+.login-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
+.login-form button { padding: 12px; font-size: 16px; }
+code { background: #fff; padding: 1px 6px; border-radius: 6px; border: 1px solid var(--line); }
+@media (max-width: 800px) { .split { grid-template-columns: 1fr; gap: 16px; } }
+
+
+/* ===== 7. 소개 (about.html) ===== */
+.about, .form-page { max-width: 880px; margin: 0 auto; }
+.lead { font-size: 16.5px; line-height: 1.7; color: #44444d; margin: 0 0 24px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+.stat { border-radius: 16px; padding: 20px; }
+.stat b { display: block; font-size: 40px; font-weight: 600; line-height: 1.1; }
+.stat span { color: #44444d; font-size: 14px; }
+.pinkbg { background: var(--pink-2); } .yellowbg { background: #feecc0; } .bluebg { background: #dcecfd; }
+.about h2 { font-size: 20px; font-weight: 600; margin: 28px 0 12px; }
+.steps { padding-left: 22px; line-height: 1.8; }
+.steps b { display: inline-block; min-width: 100px; }
+.plain { list-style: none; padding: 0; line-height: 2; }
+@media (max-width: 560px) { .stats { grid-template-columns: 1fr; } }
+
+
+/* ===== 8. 카페 등록 (register.html) ===== */
+.errors { background: #fde8ee; border: 1px solid var(--pink); border-radius: 12px; padding: 4px 16px; margin-bottom: 20px; }
+.errors p { margin: 10px 0; }
+.cafe-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+.cafe-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
+.cafe-form input, .cafe-form select { width: 100%; font-weight: 400; }
+.cafe-form small { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+.cafe-form .wide { grid-column: 1 / -1; }
+.actions { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+.actions button { padding: 12px 28px; font-size: 16px; }
+.actions a { color: var(--muted); font-size: 14px; }
+@media (max-width: 560px) { .cafe-form { grid-template-columns: 1fr; } }

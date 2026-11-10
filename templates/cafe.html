@@ -1,0 +1,40 @@
+{# 카페 상세 화면: 공통 틀을 물려받고, 본문에 "사진 + 정보 + 나의 메모"를 채워요. #}
+{% extends "base.html" %}
+{% from "_macros.html" import folder %}
+
+{% block title %}{{ cafe.name }} · 나만의 카페 노트{% endblock %}
+
+{% block content %}
+<div class="body detail">
+  <a class="crumb" href="{{ url_for('area_page', area=cafe.area) }}">← {{ folder("lav") }} {{ cafe.area }} 폴더로 돌아가기</a>
+
+  {% if just_added %}<p class="notice">🎉 새 카페를 등록했어요!</p>{% endif %}
+
+  <div class="split">
+    <div>
+      {% if cafe.image %}<img class="photo big" src="{{ photo_url(cafe.image) }}" alt="{{ cafe.name }} 사진">
+      {% else %}<div class="photo big no-photo">☕</div>{% endif %}
+    </div>
+    <div>
+      <h2>{{ cafe.name }}</h2>
+      <span class="tag p">📍 {{ cafe.area }}</span>
+      <span class="tag y">🍰 {{ cafe.menu }}</span>
+      <span class="tag">💰 {{ "{:,}원".format(cafe.price) if cafe.price else "가격 정보 없음" }}</span>
+      <span class="tag b">🔌 콘센트 {{ cafe.outlet }}</span>
+      <span class="tag">⏰ {{ cafe.open }} ~ {{ cafe.close }}</span>
+      <span class="tag p">★ {{ cafe.rating if cafe.rating else "평점 없음" }}</span>
+      <h3>📝 나의 메모</h3>
+      {% if is_owner %}
+        {# 주인에게는 메모를 쓰고 고치는 칸을 보여줘요. #}
+        <form method="post">
+          <textarea name="memo" placeholder="이 카페에 대한 나만의 메모를 적어보세요!">{{ memo }}</textarea>
+          <p><button class="go" type="submit">저장하기</button></p>
+        </form>
+      {% else %}
+        {# 구경하는 사람에게는 메모를 읽기만 할 수 있게 보여줘요. #}
+        <p class="memo-read">{{ memo if memo else "아직 남긴 메모가 없어요." }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

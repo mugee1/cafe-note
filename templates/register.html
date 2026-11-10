@@ -1,0 +1,72 @@
+{# 카페 등록 화면: 공통 틀을 물려받고, 본문에 "새 카페 적는 칸(폼)"을 채워요. #}
+{% extends "base.html" %}
+{% from "_macros.html" import folder %}
+
+{% block title %}카페 등록 · 나만의 카페 노트{% endblock %}
+
+{% block content %}
+<div class="body form-page">
+  <div class="title">{{ folder("pink") }}<h1>새 카페 등록</h1></div>
+  <p class="lead">새로 발견한 카페를 적어 주세요. <b>*</b> 표시가 있는 칸은 꼭 채워야 해요.</p>
+
+  {# 잘못 적은 칸이 있으면 무엇이 문제인지 빨간 상자에 모아서 보여줘요. #}
+  {% if errors %}
+    <div class="errors">
+      {% for e in errors %}<p>⚠️ {{ e }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  {# enctype="multipart/form-data"는 "사진 파일도 같이 보낼게요"라는 뜻이에요. #}
+  <form class="cafe-form" method="post" enctype="multipart/form-data">
+    <label class="wide">카페 이름 *
+      <input name="name" value="{{ form.name }}" maxlength="30" placeholder="예: 햇살 한 스푼" required>
+    </label>
+
+    {# list="area-list"를 붙이면 기존 지역을 고를 수도 있고, 새 지역을 직접 쓸 수도 있어요. #}
+    <label>지역 *
+      <input name="area" value="{{ form.area }}" list="area-list" maxlength="12" placeholder="고르거나 새로 적기" required>
+      <small>처음 보는 지역을 적으면 홈에 새 폴더가 생겨요.</small>
+    </label>
+    <datalist id="area-list">{% for a in areas %}<option value="{{ a }}">{% endfor %}</datalist>
+
+    <label>대표 메뉴 *
+      <input name="menu" value="{{ form.menu }}" list="menu-list" maxlength="20" placeholder="예: 크로플" required>
+    </label>
+    <datalist id="menu-list">{% for m in menus %}<option value="{{ m }}">{% endfor %}</datalist>
+
+    <label>가격 (원)
+      <input name="price" value="{{ form.price }}" type="number" min="0" step="100" placeholder="예: 5500">
+    </label>
+
+    <label>평점 (0 ~ 5)
+      <input name="rating" value="{{ form.rating }}" type="number" min="0" max="5" step="0.1" placeholder="예: 4.5">
+    </label>
+
+    <label>여는 시간
+      <input name="open" value="{{ form.open }}" type="time">
+    </label>
+
+    <label>닫는 시간
+      <input name="close" value="{{ form.close }}" type="time">
+    </label>
+
+    <label>콘센트
+      <select name="outlet">
+        <option value="" {{ "selected" if not form.outlet }}>모름</option>
+        <option value="있음" {{ "selected" if form.outlet == "있음" }}>있음</option>
+        <option value="없음" {{ "selected" if form.outlet == "없음" }}>없음</option>
+      </select>
+    </label>
+
+    <label>사진 (선택)
+      <input name="photo" type="file" accept=".jpg,.jpeg,.png,.webp">
+      <small>내가 찍은 대표 메뉴 사진을 올려 주세요. (jpg · png · webp)</small>
+    </label>
+
+    <div class="wide actions">
+      <button class="go" type="submit">등록하기</button>
+      <a href="{{ url_for('home') }}">취소</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!doctype html>
+{# =====================================================================
+   base.html : 모든 화면이 함께 쓰는 "공통 틀"이에요.
+   맨 위 제목 줄(서비스 이름 · 메뉴)과 맨 아래 바닥 글씨는 여기에만 적어요.
+   다른 화면들은 이 틀을 물려받고(extends), {% block %} 칸만 자기 내용으로 채워요.
+   ===================================================================== #}
+{% from "_macros.html" import folder %}
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {# 브라우저 탭에 보일 제목이에요. 화면마다 바꿀 수 있게 칸(block)으로 비워 둬요. #}
+  <title>{% block title %}나만의 카페 노트{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  {# 꾸밈은 static/style.css 한 파일에 모여 있어요. url_for가 그 파일의 주소를 만들어 줘요. #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="board">
+
+  {# ===== 맨 위 머리(Header): 로고 · 메뉴 · 카페 등록 버튼 =====
+     넓은 화면: [로고]          [홈  소개]  [+ 카페 등록]   ← 한 줄
+     휴대폰:    [로고]                      [+ 카페 등록]   ← 첫째 줄
+                [   홈   |   소개   ]                       ← 둘째 줄 (누르기 쉬운 큰 탭) #}
+  {% set here = request.endpoint %}
+  <header class="site-header">
+    {# 로고: 보라 폴더 + 서비스 이름. 누르면 언제든 홈으로 돌아가요. #}
+    <a class="logo" href="{{ url_for('home') }}" aria-label="나만의 카페 노트 홈으로">
+      {{ folder("lav") }}<span>나만의 카페 노트</span>
+    </a>
+
+    {# 메뉴예요. 지금 보고 있는 화면의 메뉴에는 "on" 표시를 붙여서 밑줄과 진한 글씨로 알려줘요. #}
+    <nav class="nav" aria-label="주요 메뉴">
+      <a href="{{ url_for('home') }}" class="{{ 'on' if here in ('home', 'area_page', 'detail') }}" {% if here in ('home', 'area_page', 'detail') %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>홈
+      </a>
+      <a href="{{ url_for('about') }}" class="{{ 'on' if here == 'about' }}" {% if here == 'about' %}aria-current="page"{% endif %}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>소개
+      </a>
+    </nav>
+
+    {# 가장 중요한 행동인 "카페 등록"은 눈에 띄는 검은 버튼으로 따로 둬요. #}
+    <a class="cta {{ 'on' if here == 'register' }}" href="{{ url_for('register') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>카페 등록
+    </a>
+  </header>
+
+  {# ===== 가운데 본문: 화면마다 다른 내용이 여기에 들어와요 ===== #}
+  <main>
+    {# 로그인했어요 / 로그아웃했어요 같은 안내 쪽지(flash)가 있으면 본문 위에 한 번 보여줘요. #}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}<div class="flashes">{% for m in messages %}<p>{{ m }}</p>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {# ===== 맨 아래 바닥 글씨 ===== #}
+  <footer class="foot">
+    <span>☕ 나만의 카페 노트 · 카페 {{ cafe_count }}곳을 기록하고 있어요</span>
+    <span class="foot-right">
+      Flask로 만든 작은 웹 서비스 · © {{ year }} ·
+      {# 주인이면 로그아웃 버튼, 아니면 관리자 로그인 링크를 보여줘요. (구경하는 사람에게는 눈에 덜 띄게 바닥에 둬요) #}
+      {% if is_owner %}
+        <form method="post" action="{{ url_for('logout') }}" class="inline"><button type="submit" class="linklike">로그아웃</button></form>
+      {% else %}
+        <a href="{{ url_for('login', next=request.path) }}">관리자 로그인</a>
+      {% endif %}
+    </span>
+  </footer>
+</div>
+
+{# 화면마다 필요한 자바스크립트(지도, 돋보기 등)를 넣는 칸이에요. #}
+{% block scripts %}{% endblock %}
+</body>
+</html>
